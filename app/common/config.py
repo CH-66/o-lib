@@ -1,6 +1,7 @@
 # coding:utf-8
 from enum import Enum
 import datetime
+import os
 from qfluentwidgets import (qconfig, QConfig, ConfigItem, OptionsConfigItem, BoolValidator,OptionsValidator,
                             RangeConfigItem, RangeValidator,FolderValidator)
 
@@ -47,4 +48,11 @@ class Config(QConfig):
 
 
 cfg = Config()
-qconfig.load('config/config.json', cfg)
+# 确保配置目录存在
+config_dir = os.path.join(os.path.expanduser('~'), '.olib')
+if not os.path.exists(config_dir):
+    os.makedirs(config_dir)
+
+# 使用跨平台兼容的路径
+config_path = os.path.join(config_dir, 'config.json')
+qconfig.load(config_path, cfg)

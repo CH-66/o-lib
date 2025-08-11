@@ -18,7 +18,13 @@ def setup_logger():
     if env == 'DEV':
         # 开发环境：输出到控制台和文件
         logger.add(sys.stdout, level="DEBUG", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}")
-        logger.add("app_debug.log", level="DEBUG", rotation="1 MB", retention="10 days", compression="zip")
+        # 使用跨平台路径处理方法设置日志文件路径
+        log_file_path = os.path.join(os.path.expanduser('~'), '.olib', 'app_debug.log')
+        # 确保日志目录存在
+        log_dir = os.path.dirname(log_file_path)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        logger.add(log_file_path, level="DEBUG", rotation="1 MB", retention="10 days", compression="zip")
     elif env == 'PROD':
         # 生产环境：只输出到控制台
         logger.add(sys.stdout, level="INFO", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}")

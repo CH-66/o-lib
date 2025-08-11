@@ -27,6 +27,7 @@ jobs:
           pip install loguru
           pip install requests
           pip install python-dotenv
+          pip install psutil
           # Add other dependencies here if needed
 
       - name: Build executable
@@ -59,6 +60,7 @@ jobs:
           pip install loguru
           pip install requests
           pip install python-dotenv
+          pip install psutil
           # Add other dependencies here if needed
 
       - name: Build executable

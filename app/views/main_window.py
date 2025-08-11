@@ -97,7 +97,14 @@ class Window(FramelessWindow):
 
     def initWindow(self):
         self.resize(900, 700)
-        self.setWindowIcon(QIcon('resource/logo.png'))
+        # 使用跨平台路径处理方法设置窗口图标路径
+        from app.common.icons import get_app_icon
+        icon_path = get_app_icon()
+        if icon_path and os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
+        else:
+            # 如果无法找到合适的图标文件，则使用默认的资源文件图标
+            self.setWindowIcon(QIcon(":/image/ICO"))
         self.setWindowTitle('Olib开源图书——一款永久免费的电子书软件')
         self.titleBar.setAttribute(Qt.WA_StyledBackground)
         desktop = QApplication.desktop().availableGeometry()
