@@ -61,6 +61,7 @@ jobs:
           pip install requests
           pip install python-dotenv
           pip install psutil
+          pip install pillow
           # Add other dependencies here if needed
 
       - name: Build executable
