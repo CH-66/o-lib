@@ -12,20 +12,32 @@ import os
 
 def setup_logger():
     env = get_env()  # 默认为生产环境
+    # 确保env不是None
+    if env is None:
+        env = "prod"  # 默认为生产环境
+    
     # 清空默认的日志处理器
     logger.remove()
+    
     # 根据环境设置不同的日志配置
-    if env == 'DEV':
+    if env == 'dev':  # 统一使用小写进行比较
         # 开发环境：输出到控制台和文件
         logger.add(sys.stdout, level="DEBUG", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}")
-        # 使用跨平台路径处理方法设置日志文件路径
-        log_file_path = os.path.join(os.path.expanduser('~'), '.olib', 'app_debug.log')
-        # 确保日志目录存在
-        log_dir = os.path.dirname(log_file_path)
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
-        logger.add(log_file_path, level="DEBUG", rotation="1 MB", retention="10 days", compression="zip")
-    elif env == 'PROD':
+        try:
+            # 使用跨平台路径处理方法设置日志文件路径
+            log_file_path = os.path.join(os.path.expanduser('~'), '.olib', 'app_debug.log')
+            # 确保日志目录存在
+            log_dir = os.path.dirname(log_file_path)
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
+            # 检查log_file_path是否为有效路径
+            if log_file_path:
+                logger.add(log_file_path, level="DEBUG", rotation="1 MB", retention="10 days", compression="zip")
+        except Exception as e:
+            logger.error(f"Failed to set up file logger: {e}")
+            # 如果文件日志设置失败，至少保持控制台日志
+            pass
+    elif env == 'prod':
         # 生产环境：只输出到控制台
         logger.add(sys.stdout, level="INFO", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}")
     else:
