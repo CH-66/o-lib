@@ -30,15 +30,24 @@ jobs:
           pip install psutil
           # Add other dependencies here if needed
 
+      - name: Get version from tag
+        id: get_version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      
       - name: Build executable
         run: |
           pyinstaller --onefile --windowed --icon=logo.ico --name Olib app.py --add-data "app/common/resources.py;app/common/"
 
+      - name: Rename executable with version
+        run: |
+          mv dist/Olib.exe dist/Olib-Windows-${{ env.VERSION }}.exe
+          
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: olib-windows
-          path: dist/Olib.exe
+          path: dist/Olib-Windows-${{ env.VERSION }}.exe
 
   build-macos:
     runs-on: macos-latest
@@ -66,18 +75,27 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller --onefile --windowed --icon=logo.ico --name Olib app.py --add-data "app/common/resources.py:app/common/"
+          pyinstaller --onefile --windowed --icon=logo.icns --name Olib app.py --add-data "app/common/resources.py:app/common/"
 
+      - name: Rename executable with version
+        run: |
+          mv dist/Olib dist/Olib-macOS-${{ env.VERSION }}
+          
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: olib-macos
-          path: dist/Olib.app
+          path: dist/Olib-macOS-${{ env.VERSION }}
 
   release:
     needs: [build-windows, build-macos]
     runs-on: ubuntu-latest
     steps:
+      - name: Get version from tag
+        id: get_version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          
       - name: Download Windows artifact
         uses: actions/download-artifact@v4
         with:
@@ -88,11 +106,17 @@ jobs:
         with:
           name: olib-macos
 
+      - name: List files
+        run: |
+          ls -la
+          ls -la olib-windows/
+          ls -la olib-macos/
+      
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            olib-windows/Olib.exe
-            olib-macos/Olib.app
+            olib-windows/Olib-Windows-${{ env.VERSION }}.exe
+            olib-macos/Olib-macOS-${{ env.VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
